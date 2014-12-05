@@ -1,6 +1,8 @@
 package info.nukoneko.attendancems.activity;
 
 import android.app.Activity;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -57,6 +59,8 @@ public class MainActivity extends Activity {
         MainActivity.this.findViewById(R.id.b_send_data).setEnabled(false);
         if(Globals.readingMode){
             MainActivity.this.findViewById(R.id.b_auth).setEnabled(false);
+            // socket client
+            mClient = SocketUtil.getClient(new mOnSocketActionListener());
         }else{
             MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(false);
         }
@@ -71,6 +75,8 @@ public class MainActivity extends Activity {
                         showToast("認証成功");
                         MainActivity.this.findViewById(R.id.b_auth).setEnabled(false);
                         MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(true);
+                        // socket client
+                        mClient = SocketUtil.getClient(new mOnSocketActionListener());
                     }
 
                     @Override
@@ -100,6 +106,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 try {
+                    showToast("Session Start...");
                     mClient.send("{\"sessionKey\":1234}");
                     MainActivity.this.findViewById(R.id.b_send_data).setEnabled(true);
                     MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(false);
@@ -124,9 +131,6 @@ public class MainActivity extends Activity {
                 MainActivity.this.findViewById(R.id.b_send_data).setEnabled(false);
             }
         });
-
-        // socket client
-        mClient = SocketUtil.getClient(new mOnSocketActionListener());
     }
 
 
@@ -159,7 +163,13 @@ public class MainActivity extends Activity {
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
-            showToast("Socket Close...");
+            mClient.close();
+            mAdapter.clear();
+            mClient = SocketUtil.getClient(new mOnSocketActionListener());
+
+            MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(true);
+            MainActivity.this.findViewById(R.id.b_socket_stop).setEnabled(false);
+            MainActivity.this.findViewById(R.id.b_send_data).setEnabled(false);
         }
 
         @Override
@@ -171,8 +181,17 @@ public class MainActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mAdapter.add(new EntryObject(json));
+                EntryObject object = new EntryObject(json);
+                mAdapter.add(object);
                 mListView.setSelection(mAdapter.getCount()-1);
+
+                if(object.getResult().equals("出席")){
+                    mSoundChime.play(mSoundChimeID, 1.0F, 1.0F, 0, 0, 1.0F);
+                }else if(object.getResult().equals("(処理済み)")){
+                    mSoundStone.play(mSoundStoneID, 1.0F, 1.0F, 0, 0, 1.0F);
+                }else{
+                    mSoundBad.play(mSoundBadID, 1.0F, 1.0F, 0, 0, 1.0F);
+                }
             }
         });
     }
@@ -186,6 +205,30 @@ public class MainActivity extends Activity {
         public void onFailed(String text) {
             Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private SoundPool mSoundChime;
+    private Integer mSoundChimeID;
+    private SoundPool mSoundBad;
+    private Integer mSoundBadID;
+    private SoundPool mSoundStone;
+    private Integer mSoundStoneID;
+    @Override
+    protected void onResume(){
+        super.onResume();
+        mSoundChime = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        mSoundChimeID = mSoundChime.load(getApplicationContext(), R.raw.tm2_chime002, 0);
+        mSoundBad = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        mSoundBadID = mSoundBad.load(getApplicationContext(), R.raw.tm2_quiz003bad, 0);
+        mSoundStone = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        mSoundStoneID = mSoundStone.load(getApplicationContext(), R.raw.tm2_stone001, 0);
+    }
+    @Override
+    protected  void onPause(){
+        super.onPause();
+        mSoundChime.release();
+        mSoundBad.release();
+        mSoundStone.release();
     }
 
     private void println(Object text){
