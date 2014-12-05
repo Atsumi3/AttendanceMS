@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.common;
+package info.nukoneko.attendancems.common;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

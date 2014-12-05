@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.activity;
+package info.nukoneko.attendancems.activity;
 
 import android.app.Activity;
 import android.os.Build;
@@ -16,14 +16,14 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.IOException;
 
-import info.nukoneko.attendansms.R;
-import info.nukoneko.attendansms.adapter.AttendAdapter;
-import info.nukoneko.attendansms.auth.Auth;
-import info.nukoneko.attendansms.common.network.SendID;
-import info.nukoneko.attendansms.common.network.SendUtil;
-import info.nukoneko.attendansms.common.Globals;
-import info.nukoneko.attendansms.common.network.SocketUtil;
-import info.nukoneko.attendansms.container.EntryObject;
+import info.nukoneko.attendancems.R;
+import info.nukoneko.attendancems.adapter.AttendAdapter;
+import info.nukoneko.attendancems.auth.Auth;
+import info.nukoneko.attendancems.common.network.SendID;
+import info.nukoneko.attendancems.common.network.SendUtil;
+import info.nukoneko.attendancems.common.Globals;
+import info.nukoneko.attendancems.common.network.SocketUtil;
+import info.nukoneko.attendancems.container.EntryObject;
 
 /**
  * Created by Telneko on 2014/12/04.
@@ -57,6 +57,8 @@ public class MainActivity extends Activity {
         MainActivity.this.findViewById(R.id.b_send_data).setEnabled(false);
         if(Globals.readingMode){
             MainActivity.this.findViewById(R.id.b_auth).setEnabled(false);
+        }else{
+            MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(false);
         }
 
         // first auth
@@ -68,6 +70,7 @@ public class MainActivity extends Activity {
                     public void onSuccess() {
                         showToast("認証成功");
                         MainActivity.this.findViewById(R.id.b_auth).setEnabled(false);
+                        MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(true);
                     }
 
                     @Override
@@ -169,6 +172,7 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 mAdapter.add(new EntryObject(json));
+                mListView.setSelection(mAdapter.getCount()-1);
             }
         });
     }

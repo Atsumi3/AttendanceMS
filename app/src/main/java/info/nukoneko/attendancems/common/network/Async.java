@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.common.network;
+package info.nukoneko.attendancems.common.network;
 
 import android.app.ProgressDialog;
 import android.content.Context;

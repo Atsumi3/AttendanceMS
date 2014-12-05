@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.common.json;
+package info.nukoneko.attendancems.common.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

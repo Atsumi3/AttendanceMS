@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.adapter;
+package info.nukoneko.attendancems.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,10 +10,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import info.nukoneko.attendansms.R;
-import info.nukoneko.attendansms.container.EntryObject;
+import info.nukoneko.attendancems.R;
+import info.nukoneko.attendancems.container.EntryObject;
 
-import static info.nukoneko.attendansms.common.AttendanceUtil.unixTime2DateString;
+import static info.nukoneko.attendancems.common.AttendanceUtil.unixTime2DateString;
 
 /**
  * Created by Atsumi on 2014/12/03.
@@ -65,9 +65,11 @@ public class AttendAdapter extends ArrayAdapter<EntryObject> {
 
     @Override
     public void add(EntryObject object){
+        /*
         for(int i = 0; i < this.getCount(); i++){
             if(this.getItem(i).getStudent().getUserID().equals(object.getStudent().getUserID())) return;
         }
+        */
         super.add(object);
     }
 }

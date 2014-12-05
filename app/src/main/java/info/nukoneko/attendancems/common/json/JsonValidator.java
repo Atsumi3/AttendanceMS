@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.common.json;
+package info.nukoneko.attendancems.common.json;
 
 /**
  * Created by TEJNEK on 2014/11/05.

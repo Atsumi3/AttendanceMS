@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.auth;
+package info.nukoneko.attendancems.auth;
 
 import android.app.Activity;
 import android.util.Base64;
@@ -21,13 +21,11 @@ import java.util.Random;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import info.nukoneko.attendansms.common.network.Async;
-import info.nukoneko.attendansms.common.network.AsyncCallback;
-import info.nukoneko.attendansms.common.AttendanceUtil;
-import info.nukoneko.attendansms.common.network.SendID;
-import info.nukoneko.attendansms.common.network.SendUtil;
-import info.nukoneko.attendansms.common.Globals;
-import info.nukoneko.attendansms.common.json.JsonGetItem;
+import info.nukoneko.attendancems.common.network.Async;
+import info.nukoneko.attendancems.common.network.AsyncCallback;
+import info.nukoneko.attendancems.common.network.SendUtil;
+import info.nukoneko.attendancems.common.Globals;
+import info.nukoneko.attendancems.common.json.JsonGetItem;
 
 
 /**
@@ -84,11 +82,9 @@ public class Auth{
                 String hash = generateFirstHash(result);
                 if(!hash.equals("")) {
                     Globals.hash = hash;
-                    println("認証できました");
                     println(result);
                     secondAuth();
                 }else{
-                    println("認証できませんでした");
                     Globals.readingMode = false;
                     callback.onFailed();
                 }

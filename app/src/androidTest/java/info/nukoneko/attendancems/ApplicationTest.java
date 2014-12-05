@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms;
+package info.nukoneko.attendancems;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

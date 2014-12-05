@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.common;
+package info.nukoneko.attendancems.common;
 
 import android.app.Application;
 

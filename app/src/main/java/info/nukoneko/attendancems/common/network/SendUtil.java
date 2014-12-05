@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.common.network;
+package info.nukoneko.attendancems.common.network;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,8 +27,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import info.nukoneko.attendansms.common.AttendanceUtil;
-import info.nukoneko.attendansms.common.Globals;
+import info.nukoneko.attendancems.common.Globals;
 
 /**
  * Created by TEJNEK on 2014/11/05.
@@ -51,6 +50,7 @@ public class SendUtil {
                     baseParam = baseParam.substring(0, baseParam.length() - 1);
                 if (_method.equals(Async.method.GET)) apiBaseURI += "?" + baseParam;
             }
+            baseParam = baseParam.replace("\n", "").replace("\n\r", "").replace("\r", "");
             //接続開始
             System.out.println(baseParam);
             URL url = new URL(apiBaseURI);

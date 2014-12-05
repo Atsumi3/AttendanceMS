@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.common.network;
+package info.nukoneko.attendancems.common.network;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import info.nukoneko.attendansms.common.network.SendUtil;
-import info.nukoneko.attendansms.container.OnStartUpObject;
+import info.nukoneko.attendancems.container.OnStartUpObject;
 
 /**
  * Created by Telneko on 2014/12/04.

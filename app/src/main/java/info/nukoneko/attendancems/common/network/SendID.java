@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.common.network;
+package info.nukoneko.attendancems.common.network;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import info.nukoneko.attendansms.common.Globals;
-import info.nukoneko.attendansms.common.json.JsonGetItem;
+import info.nukoneko.attendancems.common.Globals;
+import info.nukoneko.attendancems.common.json.JsonGetItem;
 
 /**
  * Created by Telneko on 2014/12/04.

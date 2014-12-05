@@ -1,4 +1,4 @@
-package info.nukoneko.attendansms.common.network;
+package info.nukoneko.attendancems.common.network;
 
 /**
  * Created by TEJNEK on 2014/11/05.
