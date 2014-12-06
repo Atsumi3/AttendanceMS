@@ -12,10 +12,10 @@ public class Globals extends Application {
     public static String hash = "";
     public static Long lectureID = 0L;
     public static boolean isAuthEnable = false;
-    public static Long sessionKey = 1234L;
     public static boolean readingMode = false;
 
-    public static String targetIP = "192.168.0.4";
+    public static String targetIP = "";
+    public static Long sessionKey = 0L;
     public static String targetPort = "8888";
     public static String targetWSPort = "8889";
 

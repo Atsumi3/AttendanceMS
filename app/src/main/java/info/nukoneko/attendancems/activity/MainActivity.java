@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.IOException;
@@ -43,6 +44,9 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Globals.targetIP = "192.168.0.7";
+        Globals.sessionKey = 1234L;
 
         //init
         mHandler = new Handler();
@@ -112,8 +116,10 @@ public class MainActivity extends Activity {
                     MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(false);
                     MainActivity.this.findViewById(R.id.b_socket_stop).setEnabled(true);
                 }
-                catch (Exception e){
+                catch (WebsocketNotConnectedException e){
                     e.printStackTrace();
+                    mClient = SocketUtil.getClient(new mOnSocketActionListener());
+
                 }
             }
         });
