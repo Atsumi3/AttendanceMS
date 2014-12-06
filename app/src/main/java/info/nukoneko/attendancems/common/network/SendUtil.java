@@ -1,5 +1,7 @@
 package info.nukoneko.attendancems.common.network;
 
+import android.net.Uri;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,7 +54,6 @@ public class SendUtil {
             }
             baseParam = baseParam.replace("\n", "").replace("\n\r", "").replace("\r", "");
             //接続開始
-            System.out.println(baseParam);
             URL url = new URL(apiBaseURI);
             //もしクッキーマネージャが作成されてなかったら作成(最初の接続)
             if (manager == null) {
@@ -73,8 +74,6 @@ public class SendUtil {
             CookieHandler.setDefault(manager);
             //SSLのチェックをしないため、変なURLに飛ばないようにしましょう。
             disableCertificateChecking();
-
-            System.out.println(apiBaseURI);
 
             if (protocol == Async.Protocol.HTTPS) {
                 HttpsURLConnection con;
@@ -155,53 +154,12 @@ public class SendUtil {
         return null;
     }
 
-    public static String createBaseUri(String host, String port, String sessionKey, String endPoint){
-        if(port.equals(""))port = "80";
-        String base = "";
-        host += "/" + sessionKey;
-        if(host.indexOf("/") > 0){
-            String[] _p = host.split("/");
-            String _ = "";
-            for (int i = 1; i < _p.length; i++){
-                _ += _p[i] + "/";
-            }
-            base = _p[0] + ":" + port + "/" + _ + endPoint;
-        }else{
-            base = host + ":" + port + "/" + endPoint;
-        }
-        return base;
-    }
-
-    public static String createBaseUri(String endpoint){
-        return Globals.targetIP + ":" + Globals.targetPort + "/" + Globals.sessionKey + "/" + endpoint;
-    }
-
-    public static String createBaseUriHTTP(){
-        return "http://" + Globals.targetIP + ":" + Globals.targetPort + "/?key=" + Globals.sessionKey;
+    public static String getBaseUri(String endPoint){
+        return Globals.serverURI.getHost() + ":" + Globals.serverURI.getPort() + "/" + Globals.serverURI.getQueryParameter("key") + "/" + (endPoint.equals("")?"":endPoint);
     }
 
     public static String createBaseUriWebSocket(){
-        return "ws://" + Globals.targetIP + ":" + Globals.targetWSPort + "/";
-    }
-
-    public static String convertToUnicode(String original) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < original.length(); i++) {
-            sb.append(String.format("\\u%04X", Character.codePointAt(original, i)));
-        }
-        String unicode = sb.toString();
-        return unicode;
-    }
-
-    private static String generateBoundary() {
-        String chars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
-        Random rand = new Random();
-        String boundary = "";
-        for (int i = 0; i < 40; i++) {
-            int r = rand.nextInt(chars.length());
-            boundary += chars.substring(r, r + 1);
-        }
-        return boundary;
+        return "ws://" + Globals.serverURI.getHost() + ":" + Globals.targetWSPort + "/";
     }
 
     private static void disableCertificateChecking() {
@@ -235,14 +193,5 @@ public class SendUtil {
         } catch (Exception e) {
             System.out.println("CertificateChecking Error : " + e.toString());
         }
-    }
-
-    //Accessor
-    public static void setCookieManager(CookieManager _manager) {
-        manager = _manager;
-    }
-
-    public static CookieManager getCookieManager() {
-        return manager;
     }
 }

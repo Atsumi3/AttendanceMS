@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <Button
+        android:id="@+id/b_auth"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="認証"
+        android:layout_weight="1"
+        android:background="@android:drawable/btn_default"/>
+    <Button
+        android:id="@+id/b_send_data"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="テストデータ送信"
+        android:layout_weight="1"
+        android:background="@android:drawable/btn_default"/>
+</LinearLayout>

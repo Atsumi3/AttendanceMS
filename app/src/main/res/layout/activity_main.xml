@@ -1,49 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp">
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/lectureInfo"
+        android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/b_auth"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+        <TextView
+            android:id="@+id/lectureName"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="認証"
-            android:layout_weight="1"
-            android:background="@android:drawable/btn_default"/>
-        <Button
-            android:id="@+id/b_send_data"
+            android:text="授業名: "/>
+        <TextView
+            android:id="@+id/teacherName"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="テストデータ送信"
-            android:layout_weight="1"
-            android:background="@android:drawable/btn_default"/>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/b_socket_start"
+            android:text="教員名: "/>
+        <TextView
+            android:id="@+id/entry"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="start"
-            android:layout_weight="1"
-            android:background="@android:drawable/btn_default"/>
-        <Button
-            android:id="@+id/b_socket_stop"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="stop"
-            android:layout_weight="1"
-            android:background="@android:drawable/btn_default"/>
+            android:text="出席: 0/ 0人"/>
     </LinearLayout>
     <ListView
         android:id="@+id/user_list"
+        android:layout_below="@id/lectureInfo"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:dividerHeight="-2dp"
         android:background="#FFF" />
-</LinearLayout>
+</RelativeLayout>

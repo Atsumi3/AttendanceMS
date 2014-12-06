@@ -5,4 +5,5 @@
         android:color="#808080"
         android:dashGap="2dp"
         android:dashWidth="5dp" />
+    <solid android:color="#FFF" />
 </shape>

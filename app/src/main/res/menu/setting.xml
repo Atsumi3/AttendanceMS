@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/b_setting"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="設定"
+        android:showAsAction="ifRoom" >
+        <menu>
+            <item android:id="@+id/menu_auth"
+                android:title="認証"
+                android:showAsAction="never"/>
+            <item android:id="@+id/menu_readingMode"
+                android:title="読取設定"
+                android:showAsAction="never" />
+            <item android:id="@+id/menu_send"
+                android:title="テストデータ送信"
+                android:showAsAction="never"/>
+        </menu>
+    </item>
+</menu>

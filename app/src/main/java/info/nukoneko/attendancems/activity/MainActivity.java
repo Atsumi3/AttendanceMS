@@ -1,20 +1,31 @@
 package info.nukoneko.attendancems.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.IOException;
@@ -22,16 +33,22 @@ import java.io.IOException;
 import info.nukoneko.attendancems.R;
 import info.nukoneko.attendancems.adapter.AttendAdapter;
 import info.nukoneko.attendancems.auth.Auth;
+import info.nukoneko.attendancems.common.AttendanceUtil;
 import info.nukoneko.attendancems.common.network.SendID;
-import info.nukoneko.attendancems.common.network.SendUtil;
 import info.nukoneko.attendancems.common.Globals;
 import info.nukoneko.attendancems.common.network.SocketUtil;
 import info.nukoneko.attendancems.container.EntryObject;
+import info.nukoneko.attendancems.container.LectureObject;
+import info.nukoneko.attendancems.container.OnStartUpObject;
+
+import static java.lang.System.setProperty;
 
 /**
  * Created by Telneko on 2014/12/04.
  */
 public class MainActivity extends Activity {
+
+    private Menu mainMenu;
 
     Handler mHandler;
 
@@ -43,126 +60,65 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
 
-        Globals.targetIP = "192.168.0.7";
-        Globals.sessionKey = 1234L;
+        // DEBUG
+        Globals.serverURI = Uri.parse("http://192.168.0.7:8888/?key=1234");
 
-        //init
+        Globals.setMacAddress(getApplication());
+
+        //init components
         mHandler = new Handler();
         mAdapter = new AttendAdapter(this);
         mListView = (ListView)findViewById(R.id.user_list);
         mListView.setAdapter(mAdapter);
+
         if ("sdk".equals(Build.PRODUCT)) {
-            java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-            java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
+            setProperty("java.net.preferIPv6Addresses", "false");
+            setProperty("java.net.preferIPv4Stack", "true");
         }
-
-        System.out.println("READING MODE :" + Globals.readingMode);
-
-        MainActivity.this.findViewById(R.id.b_send_data).setEnabled(false);
-        if(Globals.readingMode){
-            MainActivity.this.findViewById(R.id.b_auth).setEnabled(false);
-            // socket client
-            mClient = SocketUtil.getClient(new mOnSocketActionListener());
-        }else{
-            MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(false);
-        }
-
-        // first auth
-        findViewById(R.id.b_auth).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Auth(MainActivity.this, SendUtil.createBaseUriHTTP(), new Auth.AuthCallback() {
-                    @Override
-                    public void onSuccess() {
-                        showToast("認証成功");
-                        MainActivity.this.findViewById(R.id.b_auth).setEnabled(false);
-                        MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(true);
-                        // socket client
-                        mClient = SocketUtil.getClient(new mOnSocketActionListener());
-                    }
-
-                    @Override
-                    public void onFailed() {
-                        showToast("認証失敗");
-                    }
-                });
-            }
-        });
-
-        // send id
-        findViewById(R.id.b_send_data).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                println(Globals.hash);
-                if (Globals.hash.equals("")) {
-                    showToast("認証されていません");
-                    MainActivity.this.findViewById(R.id.b_send_data).setEnabled(false);
-                } else {
-                    SendID.sendID("1140096", new mOnSendResult());
-                }
-            }
-        });
-
-        // start auth
-        findViewById(R.id.b_socket_start).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    showToast("Session Start...");
-                    mClient.send("{\"sessionKey\":1234}");
-                    MainActivity.this.findViewById(R.id.b_send_data).setEnabled(true);
-                    MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(false);
-                    MainActivity.this.findViewById(R.id.b_socket_stop).setEnabled(true);
-                }
-                catch (WebsocketNotConnectedException e){
-                    e.printStackTrace();
-                    mClient = SocketUtil.getClient(new mOnSocketActionListener());
-
-                }
-            }
-        });
-
-        // stop auth
-        findViewById(R.id.b_socket_stop).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mClient.close();
-                mAdapter.clear();
-                mClient = SocketUtil.getClient(new mOnSocketActionListener());
-
-                MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(true);
-                MainActivity.this.findViewById(R.id.b_socket_stop).setEnabled(false);
-                MainActivity.this.findViewById(R.id.b_send_data).setEnabled(false);
-            }
-        });
+        mClient = SocketUtil.getClient(new mOnSocketActionListener());
     }
 
 
     public class mOnSocketActionListener implements SocketUtil.onActionCallback {
         @Override
-        public void onOpen(ServerHandshake handshakedata) {
-            showToast("Socket Start");
+        public void onOpen(ServerHandshake handshake) {
+            mClient.send("{\"sessionKey\":1234}");
         }
 
         @Override
         public void onMessage(String message) {
-            if (!message.equals("")) {
-                JsonNode jsonNode = null;
-                ObjectMapper objectMapper = new ObjectMapper();
-                try {
-                    jsonNode = objectMapper.readValue(message, JsonNode.class);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if ((jsonNode != null ? jsonNode.get("command") : null) != null) {
-                    String command = jsonNode.get("command").asText();
-                    if (command.equals("onResume")) {
+            JsonNode jsonNode = null;
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                jsonNode = objectMapper.readValue(message, JsonNode.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if ((jsonNode != null ? jsonNode.get("command") : null) != null) {
+                AttendanceUtil.CommandKind command = AttendanceUtil.getCommand(jsonNode.get("command").asText());
+                switch (command){
+                    case onStartUp:
+                        socketOnStartUp(jsonNode);
+                        break;
+                    case onReaderError:
+                        break;
+                    case onResume:
                         socketOnUpdate(jsonNode);
-                    } else if (command.equals("onRead")) {
+                        break;
+                    case onRead:
                         socketOnUpdate(jsonNode);
-                    }
+                        break;
+                    case onAdminCardReading:
+                        break;
+                    case onIdle:
+                        break;
+                    case onHeartBeat:
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -173,9 +129,8 @@ public class MainActivity extends Activity {
             mAdapter.clear();
             mClient = SocketUtil.getClient(new mOnSocketActionListener());
 
-            MainActivity.this.findViewById(R.id.b_socket_start).setEnabled(true);
-            MainActivity.this.findViewById(R.id.b_socket_stop).setEnabled(false);
             MainActivity.this.findViewById(R.id.b_send_data).setEnabled(false);
+            MainActivity.this.findViewById(R.id.b_auth).setEnabled(true);
         }
 
         @Override
@@ -183,6 +138,24 @@ public class MainActivity extends Activity {
             showToast("Socket Error...");
         }
     };
+
+    public void socketOnStartUp(final JsonNode json){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                OnStartUpObject startUpObject = new OnStartUpObject(json);
+                for(EntryObject object : startUpObject.getResumeEntryList()) {
+                    mAdapter.add(object);
+                }
+                LectureObject object = startUpObject.getLecture();
+                ((TextView) findViewById(R.id.lectureName)).setText("授業名: " + object.getName());
+                ((TextView) findViewById(R.id.teacherName)).setText("教員名: " + object.getTeacherName());
+                ((TextView) findViewById(R.id.entry)).setText("出席数: " + startUpObject.getResumeEntryList().size() + "/ " + startUpObject.getEnrollmentTable().size() + "人");
+                mListView.setSelection(mAdapter.getCount()-1);
+            }
+        });
+    }
+
     public void socketOnUpdate(final JsonNode json){
         runOnUiThread(new Runnable() {
             @Override
@@ -201,17 +174,8 @@ public class MainActivity extends Activity {
             }
         });
     }
-    public class mOnSendResult implements SendID.SendIDCallback{
-        @Override
-        public void onSuccess() {
-            Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
-        }
 
-        @Override
-        public void onFailed(String text) {
-            Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
-        }
-    }
+    /*  サウンド制御 ここから  */
 
     private SoundPool mSoundChime;
     private Integer mSoundChimeID;
@@ -237,16 +201,75 @@ public class MainActivity extends Activity {
         mSoundStone.release();
     }
 
+    /*  サウンド制御 ここまで  */
+
     private void println(Object text){
         System.out.println(text.toString());
     }
-
     private void showToast(final Object text){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(MainActivity.this, text.toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, text.toString(), Toast.LENGTH_SHORT).show();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.setting, menu);
+        mainMenu = menu;
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+            // メニュー表示
+            if (event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
+                if (mainMenu != null) {
+                    mainMenu.performIdentifierAction(R.id.b_setting, 0);
+                }
+                return true;
             }
-        });
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Integer itemID = item.getItemId();
+        switch (itemID){
+            case R.id.menu_auth:
+                new Auth(this, Globals.serverURI.toString(), new Auth.AuthCallback() {
+                    @Override
+                    public void onSuccess() {
+                        showToast("認証成功");
+                    }
+                    @Override
+                    public void onFailed() {
+                        showToast("認証失敗");
+                    }
+                });
+                break;
+            case R.id.menu_send:
+                if (Globals.hash.equals("")) {
+                    showToast("認証されていません");
+                } else {
+                    SendID.sendID("1140096", new SendID.SendIDCallback() {
+                        @Override
+                        public void onSuccess() {
+                            showToast("成功");
+                        }
+
+                        @Override
+                        public void onFailed(String text) {
+                            showToast("失敗\n" + text);
+                        }
+                    });
+                }
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 }

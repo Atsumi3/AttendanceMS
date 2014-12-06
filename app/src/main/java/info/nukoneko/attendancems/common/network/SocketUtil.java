@@ -117,7 +117,7 @@ public class SocketUtil {
     }
 
     public interface onActionCallback{
-        public void onOpen(ServerHandshake handshakedata);
+        public void onOpen(ServerHandshake handshake);
         public void onMessage(final String message);
         public void onClose(int code, String reason, boolean remote);
         public void onError(Exception ex);

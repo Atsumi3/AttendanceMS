@@ -1,6 +1,7 @@
 package info.nukoneko.attendancems.auth;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.util.Base64;
 import android.widget.Toast;
 
@@ -35,24 +36,13 @@ public class Auth{
     Activity parentActivity;
     AuthCallback callback;
 
+    Integer nonce = 0;
+
     public Auth(Activity my, String _url, AuthCallback callback){
         this.callback = callback;
         parentActivity = my;
-        try {
-            URL url = new URL(_url);
-            String _param = url.getQuery().replace("key=", "");
-            Globals.targetIP = url.getHost();
-            Globals.targetPort = String.valueOf(url.getPort());
-            Globals.sessionKey = Long.valueOf(_param);
-            if(!Globals.targetIP.equals("") && !Globals.targetPort.equals("") && Globals.sessionKey != null && Globals.sessionKey > 0) {
-                firstAuth();
-            }else{
-                println("QRコードを正しく読み取れませんでした。");
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            callback.onFailed();
-        }
+        Globals.serverURI = Uri.parse(_url);
+        firstAuth();
     }
 
     private void println(Object text){
@@ -60,21 +50,13 @@ public class Auth{
     }
 
     private void firstAuth() {
-        Globals.nonce = new Random().nextInt(10000000);
+        this.nonce = new Random().nextInt(10000000);
         new Async<String>(new AsyncCallback<String>() {
             @Override
             public String doFunc(Object... params) {
                 Map<String, Object> param = new HashMap<String, Object>();
-                param.put("nonce", Globals.nonce);
-                return SendUtil.send(
-                        Async.method.POST,
-                        Async.Protocol.HTTP,
-                        SendUtil.createBaseUri(
-                                Globals.targetIP,
-                                Globals.targetPort,
-                                Globals.sessionKey.toString(), "auth"),
-                        param
-                );
+                param.put("nonce", nonce);
+                return SendUtil.send(Async.method.POST, Async.Protocol.HTTP, SendUtil.getBaseUri("auth"), param);
             }
             @Override
             public void onResult(String result) {
@@ -98,11 +80,7 @@ public class Auth{
             public String doFunc(Object... params) {
                 Map<String, Object> param = new HashMap<String, Object>();
                 param.put("hash", Globals.hash);
-                return SendUtil.send(
-                        Async.method.POST,
-                        Async.Protocol.HTTP,
-                        SendUtil.createBaseUri(Globals.targetIP, Globals.targetPort, Globals.sessionKey.toString(), "auth"),
-                        param);
+                return SendUtil.send(Async.method.POST, Async.Protocol.HTTP, SendUtil.getBaseUri("auth"), param);
             }
 
             @Override
@@ -123,9 +101,6 @@ public class Auth{
                     callback.onSuccess();
                 }else{
                     Globals.readingMode = false;
-                    Globals.sessionKey = 0L;
-                    Globals.targetIP = "";
-                    Globals.targetPort = "";
                     callback.onFailed();
                 }
             }
@@ -142,7 +117,7 @@ public class Auth{
             ObjectMapper object = new ObjectMapper();
             JsonGetItem jsonGetItem = new JsonGetItem( object.readValue(json, JsonNode.class));
             Globals.lectureID = jsonGetItem.getLong("lecture");
-            String key = String.valueOf(Globals.nonce + jsonGetItem.getLong("timestamp") + Globals.lectureID);
+            String key = String.valueOf(this.nonce + jsonGetItem.getLong("timestamp") + Globals.lectureID);
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(new SecretKeySpec(key.getBytes(), "HmacSHA1"));
             String base64 = Base64.encodeToString(mac.doFinal(jsonGetItem.getString("hash").getBytes()), 0);

@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 import info.nukoneko.attendancems.common.json.JsonGetItem;
 
@@ -17,10 +19,11 @@ public class OnStartUpObject {
     private Integer numEnrollments;
     private LectureObject lecture;
     private ArrayList<StudentObject> enrollmentTable = new ArrayList<StudentObject>();
-    private EntryObject resumeEntryList;
+    private ArrayList<EntryObject> resumeEntryList = new ArrayList<EntryObject>();
 
     public OnStartUpObject(Object argsJson){
         try {
+            System.out.println(argsJson);
             JsonNode jsonNode = null;
             if (argsJson instanceof JsonNode) {
                 jsonNode = (JsonNode) argsJson;
@@ -35,11 +38,19 @@ public class OnStartUpObject {
             this.lecture = new LectureObject(jsonNode.get("lecture"));
             JsonNode enrollment = jsonNode.get("enrollmentTable");
             if(enrollment != null) {
-                for (int i = 0; enrollment.get(i) != null; i++) {
-                    enrollmentTable.add(new StudentObject(enrollment.get(i)));
+                Iterator it = enrollment.fields();
+                while (it.hasNext()){
+                    Map.Entry<String, JsonNode> pairs = (Map.Entry<String, JsonNode>) it.next();
+                    enrollmentTable.add(new StudentObject(pairs.getValue()));
+                    it.remove();
                 }
             }
-            this.resumeEntryList = new EntryObject(jsonNode.get("resumeEntryList"));
+            JsonNode resumeEntryList = jsonNode.get("resumeEntryList");
+            if(resumeEntryList != null) {
+                for (int i = 0; resumeEntryList.get(i) != null; i++) {
+                    this.resumeEntryList.add(new EntryObject(resumeEntryList.get(i)));
+                }
+            }
         } catch (JsonMappingException e) {
             e.printStackTrace();
         } catch (JsonParseException e) {
@@ -61,7 +72,7 @@ public class OnStartUpObject {
         return enrollmentTable;
     }
 
-    public EntryObject getResumeEntryList() {
+    public ArrayList<EntryObject> getResumeEntryList() {
         return resumeEntryList;
     }
 }

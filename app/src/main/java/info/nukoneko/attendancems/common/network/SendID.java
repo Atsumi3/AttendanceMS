@@ -1,5 +1,8 @@
 package info.nukoneko.attendancems.common.network;
 
+import android.net.wifi.WifiManager;
+import android.os.Build;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,7 +26,10 @@ public class SendID {
                 Map <String ,Object> param = new HashMap<String, Object>();
                 param.put("hash", Globals.hash);
                 param.put("sid", id);
-                return SendUtil.send(Async.method.POST, Async.Protocol.HTTP, SendUtil.createBaseUri("id"), param);
+                param.put("SerialID", Build.SERIAL);
+                param.put("MAC ADDRESS", Globals.macAddress);
+                param.put("Android ID", Build.ID);
+                return SendUtil.send(Async.method.POST, Async.Protocol.HTTP, SendUtil.getBaseUri("id"), param);
             }
 
             @Override
@@ -42,6 +48,7 @@ public class SendID {
     }
 
     private static boolean checkResult(String json){
+        if(json == null) return  false;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readValue(json, JsonNode.class);

@@ -1,22 +1,27 @@
 package info.nukoneko.attendancems.common;
 
 import android.app.Application;
+import android.content.Context;
+import android.net.Uri;
+import android.net.wifi.WifiManager;
 
 /**
  * Created by Telneko on 2014/12/04.
  */
 public class Globals extends Application {
-    public static String firstHash = "";
-    public static Integer nonce = 0;
+
+    public static Uri serverURI = null;
+
+    public static String targetWSPort = "8889";
 
     public static String hash = "";
     public static Long lectureID = 0L;
     public static boolean isAuthEnable = false;
     public static boolean readingMode = false;
 
-    public static String targetIP = "";
-    public static Long sessionKey = 0L;
-    public static String targetPort = "8888";
-    public static String targetWSPort = "8889";
+    public static String macAddress = "";
 
+    public static void setMacAddress(Application application){
+        macAddress = ((WifiManager)application.getSystemService(Context.WIFI_SERVICE)).getConnectionInfo().getMacAddress();
+    }
 }
