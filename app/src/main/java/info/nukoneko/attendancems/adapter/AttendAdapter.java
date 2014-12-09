@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import info.nukoneko.attendancems.R;
+import info.nukoneko.attendancems.common.Globals;
 import info.nukoneko.attendancems.container.EntryObject;
 
 import static info.nukoneko.attendancems.common.AttendanceUtil.unixTime2DateString;
@@ -49,7 +50,7 @@ public class AttendAdapter extends ArrayAdapter<EntryObject> {
         }
         EntryObject item = getItem(position);
 
-        holder.date.setText(unixTime2DateString(item.getTime()));
+        holder.date.setText(unixTime2DateString(getContext(), item.getTime()));
         holder.studentID.setText(item.getStudent().getUserID());
         holder.nameDetail.setText(item.getStudent().getFuriGana());
         holder.name.setText(item.getStudent().getFullName());
@@ -65,11 +66,12 @@ public class AttendAdapter extends ArrayAdapter<EntryObject> {
 
     @Override
     public void add(EntryObject object){
-        /*
-        for(int i = 0; i < this.getCount(); i++){
-            if(this.getItem(i).getStudent().getUserID().equals(object.getStudent().getUserID())) return;
+        if(Globals.isIgnoreDuplicatedEntry) {
+            for (int i = 0; i < this.getCount(); i++) {
+                if (this.getItem(i).getStudent().getUserID().equals(object.getStudent().getUserID()))
+                    return;
+            }
         }
-        */
         super.add(object);
     }
 }

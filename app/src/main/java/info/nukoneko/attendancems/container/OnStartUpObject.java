@@ -23,7 +23,6 @@ public class OnStartUpObject {
 
     public OnStartUpObject(Object argsJson){
         try {
-            System.out.println(argsJson);
             JsonNode jsonNode = null;
             if (argsJson instanceof JsonNode) {
                 jsonNode = (JsonNode) argsJson;

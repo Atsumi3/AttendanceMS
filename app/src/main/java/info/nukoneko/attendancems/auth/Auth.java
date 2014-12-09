@@ -5,14 +5,10 @@ import android.net.Uri;
 import android.util.Base64;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -38,6 +34,12 @@ public class Auth{
 
     Integer nonce = 0;
 
+    public Auth(Activity my, AuthCallback callback){
+        this.callback = callback;
+        this.parentActivity = my;
+        if(Globals.serverURI != null) sessionAuth();
+    }
+
     public Auth(Activity my, String _url, AuthCallback callback){
         this.callback = callback;
         parentActivity = my;
@@ -45,13 +47,9 @@ public class Auth{
         firstAuth();
     }
 
-    private void println(Object text){
-        Toast.makeText(parentActivity, text.toString(), Toast.LENGTH_SHORT).show();
-    }
-
     private void firstAuth() {
         this.nonce = new Random().nextInt(10000000);
-        new Async<String>(new AsyncCallback<String>() {
+        new Async<>(new AsyncCallback<String>() {
             @Override
             public String doFunc(Object... params) {
                 Map<String, Object> param = new HashMap<String, Object>();
@@ -60,12 +58,10 @@ public class Auth{
             }
             @Override
             public void onResult(String result) {
-                if(result == null)return;
                 String hash = generateFirstHash(result);
                 if(!hash.equals("")) {
-                    Globals.hash = hash;
-                    println(result);
-                    secondAuth();
+                    Globals.sessionToken = hash;
+                    sessionAuth();
                 }else{
                     Globals.readingMode = false;
                     callback.onFailed();
@@ -74,12 +70,12 @@ public class Auth{
         }).run();
     }
 
-    private void secondAuth(){
-        new Async<String>(new AsyncCallback<String>() {
+    private void sessionAuth(){
+        new Async<>(new AsyncCallback<String>() {
             @Override
             public String doFunc(Object... params) {
                 Map<String, Object> param = new HashMap<String, Object>();
-                param.put("hash", Globals.hash);
+                param.put("hash", Globals.sessionToken);
                 return SendUtil.send(Async.method.POST, Async.Protocol.HTTP, SendUtil.getBaseUri("auth"), param);
             }
 
@@ -88,16 +84,14 @@ public class Auth{
                 try{
                     ObjectMapper object = new ObjectMapper();
                     JsonNode root = object.readValue(result, JsonNode.class);
-                    Globals.isAuthEnable = root.get("auth").isBoolean();
-                } catch (JsonMappingException e) {
-                    e.printStackTrace();
-                } catch (JsonParseException e) {
-                    e.printStackTrace();
+                    Globals.isAuthEnable = root.get("auth").asBoolean(false);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Globals.isAuthEnable = false;
                 }
                 if(Globals.isAuthEnable) {
                     Globals.readingMode = true;
+                    ((Globals)parentActivity.getApplication()).saveSettingPreference();
                     callback.onSuccess();
                 }else{
                     Globals.readingMode = false;
@@ -121,17 +115,8 @@ public class Auth{
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(new SecretKeySpec(key.getBytes(), "HmacSHA1"));
             String base64 = Base64.encodeToString(mac.doFinal(jsonGetItem.getString("hash").getBytes()), 0);
-            System.out.println("BASE - " + base64);
             return base64.replace('+', '-').replace('/', '_');
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | IOException e) {
             e.printStackTrace();
         }
         return "";

@@ -2,32 +2,54 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp">
-    <LinearLayout
-        android:id="@+id/lectureInfo"
-        android:orientation="vertical"
+    android:paddingRight="8dp"
+    android:paddingLeft="8dp">
+
+    <RelativeLayout
+        android:id="@+id/main_header"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp">
+        android:layout_height="70dp">
         <TextView
-            android:id="@+id/lectureName"
+            android:id="@+id/auth_status"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center_vertical"
+            android:padding="10dp"
+            android:textSize="20sp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:background="@drawable/dotted_line"/>
+        <LinearLayout
+            android:id="@+id/lectureInfo"
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="授業名: "/>
-        <TextView
-            android:id="@+id/teacherName"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="教員名: "/>
-        <TextView
-            android:id="@+id/entry"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="出席: 0/ 0人"/>
-    </LinearLayout>
+            android:layout_height="fill_parent"
+            android:gravity="center_vertical"
+            android:layout_toRightOf="@id/auth_status"
+            android:padding="5dp"
+            android:layout_marginLeft="20dp">
+            <TextView
+                android:id="@+id/lectureName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/lecture_name"/>
+            <TextView
+                android:id="@+id/teacherName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/teacher_name"/>
+            <TextView
+                android:id="@+id/entry"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/entry_num"/>
+        </LinearLayout>
+    </RelativeLayout>
     <ListView
         android:id="@+id/user_list"
-        android:layout_below="@id/lectureInfo"
+        android:layout_below="@id/main_header"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:dividerHeight="-2dp"
