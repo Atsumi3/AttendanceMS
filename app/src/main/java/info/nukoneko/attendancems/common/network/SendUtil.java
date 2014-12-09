@@ -166,9 +166,7 @@ public class SendUtil {
                 con.disconnect(); //接続を切って
                 return ret; //返す
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
         return null;

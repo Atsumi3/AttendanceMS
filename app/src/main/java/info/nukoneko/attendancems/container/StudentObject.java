@@ -35,10 +35,6 @@ public class StudentObject {
             this.furiGana = json.getString("furigana");
             this.gender = json.getString("gender");
             this.logName = json.getString("logname");
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

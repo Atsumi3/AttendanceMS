@@ -26,7 +26,7 @@ public class Async<T> {
         this.myTask = new AsyncTask<Void, Void, T>() {
             @Override
             protected T doInBackground(Void... voids) {
-                return (T) asyncAPICallback.doFunc(params);
+                return asyncAPICallback.doFunc(params);
             }
 
             @Override
@@ -39,22 +39,6 @@ public class Async<T> {
                 }
             }
         };
-    }
-
-    public Async setProgress(Context context, boolean progressShow, String progressString, boolean cancelable) {
-        this.context = context;
-        this.progressShow = progressShow;
-        this.progressString = progressString;
-        this.cancelable = cancelable;
-        return this;
-    }
-
-    public AsyncTask<Void, Void, T> getMyTask() {
-        return this.myTask;
-    }
-
-    public boolean isCancelled() {
-        return this.myTask.isCancelled();
     }
 
     public void run() {

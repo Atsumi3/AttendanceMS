@@ -38,10 +38,6 @@ public class EntryObject {
             this.student = new StudentObject(jsonNode.get("student"));
             this.groupID = json.getInteger("groupID");
             this.sound = json.getBoolean("sound");
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

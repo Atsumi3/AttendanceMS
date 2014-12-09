@@ -19,7 +19,7 @@ import info.nukoneko.attendancems.common.json.JsonGetItem;
  */
 public class SendID {
     public static void sendID(final String id, final SendIDCallback callback){
-        new Async<String>(new AsyncCallback<String>() {
+        new Async<>(new AsyncCallback<String>() {
             @Override
             public String doFunc(Object... params) {
                 Map <String ,Object> param = new HashMap<String, Object>();
@@ -50,10 +50,6 @@ public class SendID {
             JsonNode jsonNode = objectMapper.readValue(json, JsonNode.class);
             JsonGetItem jsonGetItem = new JsonGetItem(jsonNode);
             return jsonGetItem.getBoolean("result");
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

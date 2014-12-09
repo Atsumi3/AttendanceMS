@@ -37,11 +37,10 @@ public class OnStartUpObject {
             this.lecture = new LectureObject(jsonNode.get("lecture"));
             JsonNode enrollment = jsonNode.get("enrollmentTable");
             if(enrollment != null) {
-                Iterator it = enrollment.fields();
-                while (it.hasNext()){
-                    Map.Entry<String, JsonNode> pairs = (Map.Entry<String, JsonNode>) it.next();
-                    enrollmentTable.add(new StudentObject(pairs.getValue()));
-                    it.remove();
+                Iterator<Map.Entry<String, JsonNode>> enroll = enrollment.fields();
+                while (enroll.hasNext()){
+                    enrollmentTable.add(new StudentObject(enroll.next().getValue()));
+                    enroll.remove();
                 }
             }
             JsonNode resumeEntryList = jsonNode.get("resumeEntryList");
@@ -50,10 +49,6 @@ public class OnStartUpObject {
                     this.resumeEntryList.add(new EntryObject(resumeEntryList.get(i)));
                 }
             }
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,20 +1,26 @@
 <resources>
     <string name="app_name">AttendanceMS</string>
+
     <string name="PREF_SESSION_URL">PREF_SESSION_URL</string>
     <string name="PREF_SESSION_TOKEN">PREF_SESSION_TOKEN</string>
+
     <string name="authenticated">認証済み</string>
+    <string name="authenticate_success">認証成功</string>
     <string name="un_authenticated">未認証</string>
-    <string name="socket_close">Socketが閉じられました</string>
+    <string name="authenticate_failed">認証失敗</string>
+
     <string name="lecture_name">"授業名: "</string>
     <string name="teacher_name">"教員名: "</string>
     <string name="entry_num">"出席数: "</string>
     <string name="entry">出席</string>
     <string name="entered">(処理済み)</string>
-    <string name="authenticate_successfly">認証成功</string>
-    <string name="authenticate_failed">認証失敗</string>
+
     <string name="read_success">読み取り成功</string>
-    <string name="read_failed_qr">QRコードを正しく読み取れませんでした</string>
     <string name="read_failed">読み取り失敗</string>
+    <string name="read_failed_qr">QRコードを正しく読み取れませんでした</string>
+
+    <string name="socket_close">Socketが閉じられました</string>
+
     <string name="not_connected_network">ネットワークに接続されていません。\n接続をしてから起動してください</string>
     <string name="please_display_qr_code">QRコードを写し、画面にタッチしてください</string>
     <string name="entry_date_format">yyyy年 MM月 dd日 EEE曜日 HH:mm:ss</string>

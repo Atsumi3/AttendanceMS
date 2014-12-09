@@ -6,18 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -108,7 +103,7 @@ public class MainActivity extends Activity {
                         new Auth(MainActivity.this, Globals.serverURI.toString(), new Auth.AuthCallback() {
                             @Override
                             public void onSuccess() {
-                                showToast(getString(R.string.authenticate_successfly));
+                                showToast(getString(R.string.authenticate_success));
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {

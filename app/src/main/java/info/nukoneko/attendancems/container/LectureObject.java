@@ -43,10 +43,6 @@ public class LectureObject {
             this.semester = json.getString("semester");
             this.wDay = json.getString("wday");
             this.time = json.getString("time");
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
