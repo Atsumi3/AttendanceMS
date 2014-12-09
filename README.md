@@ -3,6 +3,7 @@ Attendance MS
 Overview  
 ============  
 This program is Attendance Management System.
+
 use IDE -> Android Studio 1.0.0  (https://developer.android.com/sdk/installing/studio.html)
   
 Detail  
