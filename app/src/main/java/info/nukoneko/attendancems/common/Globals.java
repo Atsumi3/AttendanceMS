@@ -16,15 +16,10 @@ public class Globals extends Application {
     public static boolean isDebug = true;
 
     public static Uri serverURI = null;
-
-    public static String targetWSPort = "8889";
-
     public static String sessionToken = "";
-    public static Long lectureID = 0L;
-    public static boolean isAuthEnable = false;
-    public static boolean readingMode = false;
 
     public static String macAddress = "";
+    public static String targetWSPort = "8889";
 
     public static boolean isIgnoreDuplicatedEntry = false;
 

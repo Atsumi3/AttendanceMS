@@ -61,7 +61,10 @@ public class FirstActivity extends Activity {
         new Async<>(new AsyncCallback<String>() {
             @Override
             public String doFunc(Object... params) {
-                return SendUtil.send(Async.method.GET, Async.Protocol.HTTP, Globals.serverURI.toString(), null);
+                String uri = Globals.serverURI.toString();
+                System.out.println(uri);
+                return SendUtil.send(Async.method.POST, Async.Protocol.HTTP,
+                        SendUtil.getBaseUri("auth"), null);
             }
 
             @Override

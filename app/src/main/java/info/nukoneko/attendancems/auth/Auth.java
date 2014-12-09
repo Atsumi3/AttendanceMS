@@ -1,22 +1,13 @@
 package info.nukoneko.attendancems.auth;
 
 import android.app.Activity;
-import android.net.Uri;
-import android.util.Base64;
-import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 import info.nukoneko.attendancems.common.network.Async;
 import info.nukoneko.attendancems.common.network.AsyncCallback;
@@ -40,30 +31,28 @@ public class Auth{
         if(Globals.serverURI != null) sessionAuth();
     }
 
-    public Auth(Activity my, String _url, AuthCallback callback){
+    public Auth(Activity my, LoginObject object, AuthCallback callback){
         this.callback = callback;
         parentActivity = my;
-        Globals.serverURI = Uri.parse(_url);
-        firstAuth();
+        firstAuth(object);
     }
 
-    private void firstAuth() {
-        this.nonce = new Random().nextInt(10000000);
+    private void firstAuth(final LoginObject object) {
         new Async<>(new AsyncCallback<String>() {
             @Override
             public String doFunc(Object... params) {
                 Map<String, Object> param = new HashMap<String, Object>();
-                param.put("nonce", nonce);
-                return SendUtil.send(Async.method.POST, Async.Protocol.HTTP, SendUtil.getBaseUri("auth"), param);
+                param.put("userId", object.getUserID());
+                param.put("passWd", object.getPassWD());
+                return SendUtil.send(Async.method.POST, Async.Protocol.HTTP, SendUtil.getBaseUri("test"), param);
             }
             @Override
             public void onResult(String result) {
-                String hash = generateFirstHash(result);
-                if(!hash.equals("")) {
-                    Globals.sessionToken = hash;
+                JsonGetItem json = parseJson(result);
+                if(json != null && json.getBoolean("auth")) {
+                    Globals.sessionToken = json.getString("hash");
                     sessionAuth();
                 }else{
-                    Globals.readingMode = false;
                     callback.onFailed();
                 }
             }
@@ -81,20 +70,11 @@ public class Auth{
 
             @Override
             public void onResult(String result) {
-                try{
-                    ObjectMapper object = new ObjectMapper();
-                    JsonNode root = object.readValue(result, JsonNode.class);
-                    Globals.isAuthEnable = root.get("auth").asBoolean(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Globals.isAuthEnable = false;
-                }
-                if(Globals.isAuthEnable) {
-                    Globals.readingMode = true;
+                JsonGetItem json = parseJson(result);
+                if(json != null && json.getBoolean("auth")) {
                     ((Globals)parentActivity.getApplication()).saveSettingPreference();
                     callback.onSuccess();
                 }else{
-                    Globals.readingMode = false;
                     callback.onFailed();
                 }
             }
@@ -106,19 +86,29 @@ public class Auth{
         public void onFailed();
     }
 
-    private String generateFirstHash(String json) {
+    private JsonGetItem parseJson(String json) {
+        JsonGetItem jsonGetItem = null;
         try {
             ObjectMapper object = new ObjectMapper();
-            JsonGetItem jsonGetItem = new JsonGetItem( object.readValue(json, JsonNode.class));
-            Globals.lectureID = jsonGetItem.getLong("lecture");
-            String key = String.valueOf(this.nonce + jsonGetItem.getLong("timestamp") + Globals.lectureID);
-            Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(new SecretKeySpec(key.getBytes(), "HmacSHA1"));
-            String base64 = Base64.encodeToString(mac.doFinal(jsonGetItem.getString("hash").getBytes()), 0);
-            return base64.replace('+', '-').replace('/', '_');
-        } catch (NoSuchAlgorithmException | InvalidKeyException | IOException e) {
+            jsonGetItem = new JsonGetItem( object.readValue(json, JsonNode.class));
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
-        return "";
+        return jsonGetItem;
+    }
+
+    public static class LoginObject{
+        private String userID = "";
+        private String passWD = "";
+        public LoginObject(String u, String p){
+            this.userID = u;
+            this.passWD = p;
+        }
+        public String getUserID(){
+            return this.userID;
+        }
+        public String getPassWD(){
+            return this.passWD;
+        }
     }
 }

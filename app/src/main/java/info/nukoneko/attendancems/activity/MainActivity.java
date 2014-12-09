@@ -1,6 +1,7 @@
 package info.nukoneko.attendancems.activity;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import info.nukoneko.attendancems.common.network.SocketUtil;
 import info.nukoneko.attendancems.container.EntryObject;
 import info.nukoneko.attendancems.container.LectureObject;
 import info.nukoneko.attendancems.container.OnStartUpObject;
+import info.nukoneko.attendancems.fragment.LoginDialogFragment;
 
 import static java.lang.System.setProperty;
 
@@ -92,40 +94,25 @@ public class MainActivity extends Activity {
         }else{
             authStatusText.setText(getString(R.string.un_authenticated));
         }
+        authStatusText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(authStatusText.getText().toString().equals(getString(R.string.un_authenticated))){
+                    DialogFragment loginFragment = new LoginDialogFragment(new Auth.AuthCallback() {
+                        @Override
+                        public void onSuccess() {
+                            authStatusText.setText(getString(R.string.authenticated));
+                        }
 
-            authStatusText.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(Globals.isAuthEnable){
-
-                    }else {
-                        final TextView authStatusText = (TextView) findViewById(R.id.auth_status);
-                        new Auth(MainActivity.this, Globals.serverURI.toString(), new Auth.AuthCallback() {
-                            @Override
-                            public void onSuccess() {
-                                showToast(getString(R.string.authenticate_success));
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        authStatusText.setText(getString(R.string.authenticated));
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onFailed() {
-                                showToast(getString(R.string.authenticate_failed));
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        authStatusText.setText(getString(R.string.un_authenticated));
-                                    }
-                                });
-                            }
-                        });
-                    }
+                        @Override
+                        public void onFailed() {
+                            authStatusText.setText(getString(R.string.un_authenticated));
+                        }
+                    });
+                    loginFragment.show(getFragmentManager(), "login");
                 }
-            });
+            }
+        });
 
         // Socket
         if ("sdk".equals(Build.PRODUCT)) {
@@ -287,7 +274,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void showToast(final Object text){
+    public void showToast(final Object text){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
