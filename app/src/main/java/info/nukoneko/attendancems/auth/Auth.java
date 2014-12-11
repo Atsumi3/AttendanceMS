@@ -70,6 +70,7 @@ public class Auth{
 
             @Override
             public void onResult(String result) {
+                System.out.println("SESSION : " + result);
                 JsonGetItem json = parseJson(result);
                 if(json != null && json.getBoolean("auth")) {
                     ((Globals)parentActivity.getApplication()).saveSettingPreference();

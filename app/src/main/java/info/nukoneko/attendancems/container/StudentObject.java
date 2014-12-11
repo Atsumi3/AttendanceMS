@@ -27,7 +27,7 @@ public class StudentObject {
                 ObjectMapper objectMapper = new ObjectMapper();
                 jsonNode = objectMapper.readValue((String) argsJson, JsonNode.class);
             } else {
-                throw new IllegalArgumentException();
+                return;
             }
             JsonGetItem json = new JsonGetItem(jsonNode);
             this.userID = json.getString("userID");

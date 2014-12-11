@@ -101,11 +101,13 @@ public class MainActivity extends Activity {
                     DialogFragment loginFragment = new LoginDialogFragment(new Auth.AuthCallback() {
                         @Override
                         public void onSuccess() {
+                            System.out.println("認証");
                             authStatusText.setText(getString(R.string.authenticated));
                         }
 
                         @Override
                         public void onFailed() {
+                            System.out.println("認証できませんでした");
                             authStatusText.setText(getString(R.string.un_authenticated));
                         }
                     });
@@ -192,13 +194,9 @@ public class MainActivity extends Activity {
         public void onError(Exception ex) {
             // 鯖落ちした時などの処理
             showToast(getString(R.string.socket_close));
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
                     startActivity(new Intent(MainActivity.this, QRReadActivity.class));
                     finish();
-                }
-            });
+
         }
     };
 

@@ -49,8 +49,13 @@ public class QRReadActivity extends Activity {
     private SurfaceHolder.Callback callback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
-            mCamera = Camera.open();
-
+            try {
+                mCamera = Camera.open();
+            }
+            catch (RuntimeException e){
+                Toast.makeText(QRReadActivity.this, "カメラが開けません", Toast.LENGTH_SHORT).show();
+                finish();
+            }
             // ここで回転を決める
             if(isPortrait()) {
                 mCamera.setDisplayOrientation(90);
