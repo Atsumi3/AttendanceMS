@@ -32,7 +32,6 @@ import info.nukoneko.attendancems.common.network.SendUtil;
  * Created by Telneko on 2014/12/09.
  */
 public class QRReadActivity extends Activity {
-    private SurfaceView mSurfaceView;
     private Camera mCamera;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,7 +40,7 @@ public class QRReadActivity extends Activity {
 
         setContentView(R.layout.activity_qr_read);
 
-        mSurfaceView = (SurfaceView)findViewById(R.id.surface);
+        SurfaceView mSurfaceView = (SurfaceView) findViewById(R.id.surface);
         mSurfaceView.setOnClickListener(onSurfaceClickListener);
         SurfaceHolder holder = mSurfaceView.getHolder();
         holder.addCallback(callback);
@@ -128,23 +127,21 @@ public class QRReadActivity extends Activity {
         Camera.Size optimalSize = null;
         double minDiff = Double.MAX_VALUE;
 
-        int targetHeight = h;
-
         for (Camera.Size size : sizes) {
             double ratio = (double) size.width / size.height;
             if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (Math.abs(size.height - targetHeight) < minDiff) {
+            if (Math.abs(size.height - h) < minDiff) {
                 optimalSize = size;
-                minDiff = Math.abs(size.height - targetHeight);
+                minDiff = Math.abs(size.height - h);
             }
         }
 
         if (optimalSize == null) {
             minDiff = Double.MAX_VALUE;
             for (Camera.Size size : sizes) {
-                if (Math.abs(size.height - targetHeight) < minDiff) {
+                if (Math.abs(size.height - h) < minDiff) {
                     optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
+                    minDiff = Math.abs(size.height - h);
                 }
             }
         }
@@ -168,7 +165,6 @@ public class QRReadActivity extends Activity {
             public void onResult(String result) {
                 if(result == null || result.contains("Error:")){
                     Toast.makeText(QRReadActivity.this, getString(R.string.read_failed_qr), Toast.LENGTH_SHORT).show();
-                    return;
                 }else {
                     Toast.makeText(QRReadActivity.this, getString(R.string.read_success), Toast.LENGTH_SHORT).show();
                     Globals.serverURI = Uri.parse(url);

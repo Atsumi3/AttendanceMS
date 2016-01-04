@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
@@ -46,45 +47,29 @@ public class FirstActivity extends Activity {
         Globals globals = (Globals) this.getApplication();
         // load success
         if (!globals.loadSettingPreference()) {
-            new Handler().postDelayed(new Runnable() {
-                public void run() {
-                    Intent intent = new Intent(FirstActivity.this, QRReadActivity.class);
-                    startActivity(intent);
-                    FirstActivity.this.finish();
-                }
-            }, 2000);
+            intentQRReadActivity();
         }else{
             isExistServer();
         }
     }
-    public boolean isEnableNetWorkConnect(Context context){
-        ConnectivityManager cm =  (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public boolean isEnableNetWorkConnect(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
-        if( info != null ){
-            return info.isConnected();
-        } else {
-            return false;
-        }
+        return info != null && info.isConnected();
     }
     public void isExistServer(){
-        new Async<String>(new AsyncCallback<String>() {
+        new Async<>(new AsyncCallback<String>() {
             @Override
             public String doFunc(Object... params) {
-                    return SendUtil.send(Async.method.GET, Async.Protocol.HTTP, Globals.serverURI.toString(), null);
+                return SendUtil.send(Async.method.GET, Async.Protocol.HTTP, Globals.serverURI.toString(), null);
             }
 
             @Override
             public void onResult(String result) {
-                if(result == null || result.contains("Error:")){
+                if (result == null || result.contains("Error:")) {
                     // NotExist
-                    new Handler().postDelayed(new Runnable() {
-                        public void run() {
-                            Intent intent = new Intent(FirstActivity.this, QRReadActivity.class);
-                            startActivity(intent);
-                            FirstActivity.this.finish();
-                        }
-                    }, 2000);
-                }else{
+                    intentQRReadActivity();
+                } else {
                     //Exist
                     new Handler().postDelayed(new Runnable() {
                         public void run() {
@@ -96,5 +81,21 @@ public class FirstActivity extends Activity {
                 }
             }
         }).run();
+    }
+
+    public void intentQRReadActivity(){
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                Intent intent;
+                // Android のバージョンで カメラのビューを分岐
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    intent = new Intent(FirstActivity.this, QRReadActivity2.class);
+                } else {
+                    intent = new Intent(FirstActivity.this, QRReadActivity.class);
+                }
+                startActivity(intent);
+                FirstActivity.this.finish();
+            }
+        }, 2000);
     }
 }
